@@ -91,7 +91,6 @@ API будет доступно по адресу: http://localhost:8000
     - `skip` (int): количество пропускаемых записей (по умолчанию 0)
     - `limit` (int): максимальное количество записей (по умолчанию 100)
     - `title` (str, опционально): фильтр по названию книги
-    - `author` (str, опционально): фильтр по автору
     - `category_id` (int, опционально): фильтр по ID категории
 - `GET /books/{book_id}` - получить книгу по ID
 - `POST /books` - создать новую книгу
@@ -113,15 +112,16 @@ curl -X POST "http://localhost:8000/books" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Война и мир",
-    "author": "Лев Толстой",
     "description": "Роман-эпопея",
+    "price": 850.50,
+    "url": "https://example.com/book",
     "category_id": 1
   }'
 ```
 
 ### Получение книг с фильтрацией
 ```bash
-curl "http://localhost:8000/books?author=Толстой&category_id=1"
+curl "http://localhost:8000/books?title=Война&category_id=1"
 ```
 
 ## Структура проекта
@@ -159,40 +159,30 @@ competence6/
 └── README.md
 ```
 
-## Скриншоты и примеры
 
-В папке `examples/` должны быть размещены скриншоты работы API:
+## Вспомогательные скрипты
 
-1. **swagger_docs.png** - скриншот страницы `/docs` (Swagger UI)
-2. **health_check.png** - скриншот работы эндпоинта `/health`
-3. **categories_crud.png** - скриншоты CRUD операций с категориями
-4. **books_crud.png** - скриншоты CRUD операций с книгами
-5. **filtering.png** - скриншоты работы фильтрации
-6. **psql_select.png** - **ОБЯЗАТЕЛЬНО**: скриншот psql с SELECT запросами по таблицам categories и books
+В папке `scripts/` находятся полезные скрипты:
 
-### Инструкция по созданию скриншотов
+- **`check_db.py`** - проверка подключения к базе данных:
+  ```bash
+  python scripts/check_db.py
+  ```
 
-1. Запустите сервер: `uvicorn main:app --reload`
-2. Откройте браузер и перейдите на http://localhost:8000/docs
-3. Сделайте скриншоты:
-   - Главной страницы Swagger UI
-   - Тестирования каждого эндпоинта
-   - Результатов фильтрации
-4. **Создайте скриншот psql с SELECT запросами:**
-   - Подключитесь к базе данных: `psql -h localhost -U your_username -d books_db`
-   - Выполните запросы из файла `examples/psql_select_queries.sql`:
-     ```sql
-     SELECT * FROM categories;
-     SELECT * FROM books;
-     SELECT b.id, b.title, b.price, c.name AS category_name
-     FROM books b
-     JOIN categories c ON b.category_id = c.id;
-     ```
-   - Сделайте скриншот терминала с результатами запросов
-   - Сохраните как `psql_select.png`
-5. Сохраните все скриншоты в папку `examples/`
+- **`init_data.py`** - добавление тестовых данных в БД:
+  ```bash
+  python scripts/init_data.py
+  ```
 
-**Примечание:** Если возникают проблемы с подключением к PostgreSQL через psql (ошибка "Peer authentication failed"), используйте подключение через TCP/IP: `psql -h localhost -U username -d books_db`. Подробные инструкции в файле `examples/PSQL_INSTRUCTIONS.md`.
+- **`test_api.sh`** - тестирование всех эндпоинтов API:
+  ```bash
+  bash scripts/test_api.sh
+  ```
+
+- **`create_db.sh`** - создание базы данных:
+  ```bash
+  bash scripts/create_db.sh
+  ```
 
 ## Чек-лист выполнения
 
@@ -202,7 +192,6 @@ competence6/
 - ✅ Собрать приложение в main.py и добавить /health
 - ✅ Запустить сервер, проверить работу /docs и протестировать эндпоинты
 - ✅ Проверить данные в PostgreSQL после запросов
-- ✅ Сделать скрины и добавить их в examples/, обновить README
 - ✅ Закоммитить и залить проект на GitHub
 
 ## Автор

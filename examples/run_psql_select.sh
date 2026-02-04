@@ -5,6 +5,7 @@
 
 # Вариант 1: Через localhost (TCP/IP)
 echo "Попытка подключения через localhost..."
+cd "$(dirname "$0")"
 psql -h localhost -U octagon -d books_db -f psql_select_queries.sql
 
 # Если не работает, попробуйте вариант 2:
