@@ -38,7 +38,7 @@ pip install -r requirements.txt
 **Примечание:** В Linux/WSL может потребоваться использовать `python3` вместо `python`. Если возникает ошибка "externally-managed-environment", обязательно используйте виртуальное окружение.
 
 4. Настройте базу данных:
-   - Создайте файл `.env` на основе `.env.example`
+   - Создайте файл `.env` на основе `config/env.example`
    - Укажите строку подключения к PostgreSQL:
    ```
    DATABASE_URL=postgresql://user:password@localhost:5432/books_db
@@ -128,7 +128,7 @@ curl "http://localhost:8000/books?author=Толстой&category_id=1"
 
 ```
 competence6/
-├── app/
+├── app/                 # Основное приложение
 │   ├── __init__.py
 │   ├── main.py          # Точка входа приложения FastAPI
 │   ├── schemas.py       # Pydantic схемы (Category, Book)
@@ -141,14 +141,20 @@ competence6/
 │       ├── __init__.py
 │       ├── categories.py # Роутер для категорий
 │       └── books.py     # Роутер для книг
+├── scripts/             # Вспомогательные скрипты
+│   ├── check_db.py      # Проверка подключения к БД
+│   ├── create_db.sh     # Создание базы данных
+│   ├── init_data.py     # Инициализация тестовых данных
+│   └── test_api.sh      # Тестирование API
+├── sql/                 # SQL скрипты
+│   └── psql_select_queries.sql  # Запросы для проверки данных
+├── docs/                # Документация
+│   └── api_examples.md  # Примеры запросов к API
+├── config/              # Конфигурационные файлы
+│   └── env.example      # Пример файла с переменными окружения
 ├── examples/            # Скриншоты работы API
 ├── run.py              # Скрипт для запуска приложения
-├── check_db.py         # Скрипт для проверки подключения к БД
-├── create_db.sh        # Скрипт для создания базы данных
-├── init_db.sql         # SQL скрипт для инициализации БД
-├── fix_tables.sql      # SQL скрипт для исправления таблиц
 ├── requirements.txt    # Зависимости проекта
-├── .env.example        # Пример файла с переменными окружения
 ├── .gitignore
 └── README.md
 ```
@@ -178,7 +184,7 @@ competence6/
      ```sql
      SELECT * FROM categories;
      SELECT * FROM books;
-     SELECT b.id, b.title, b.author, c.name AS category_name
+     SELECT b.id, b.title, b.price, c.name AS category_name
      FROM books b
      JOIN categories c ON b.category_id = c.id;
      ```

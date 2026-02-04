@@ -22,8 +22,9 @@ SELECT * FROM books;
 SELECT 
     b.id,
     b.title,
-    b.author,
     b.description,
+    b.price,
+    b.url,
     c.name AS category_name,
     c.description AS category_description
 FROM books b
