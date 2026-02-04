@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from app import schemas, models
-from app.database import get_db
+from app import schemas
+from app.db.models import Category, Book
+from app.db.db import get_db
 
 router = APIRouter(prefix="/categories", tags=["categories"])
 
@@ -11,11 +12,11 @@ router = APIRouter(prefix="/categories", tags=["categories"])
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
     """Создать новую категорию"""
     # Проверка на уникальность имени
-    db_category = db.query(models.Category).filter(models.Category.name == category.name).first()
+    db_category = db.query(Category).filter(Category.name == category.name).first()
     if db_category:
         raise HTTPException(status_code=400, detail="Категория с таким именем уже существует")
     
-    db_category = models.Category(**category.model_dump())
+    db_category = Category(**category.model_dump())
     db.add(db_category)
     db.commit()
     db.refresh(db_category)
@@ -30,10 +31,10 @@ def get_categories(
     db: Session = Depends(get_db)
 ):
     """Получить список категорий с фильтрацией"""
-    query = db.query(models.Category)
+    query = db.query(Category)
     
     if name:
-        query = query.filter(models.Category.name.ilike(f"%{name}%"))
+        query = query.filter(Category.name.ilike(f"%{name}%"))
     
     categories = query.offset(skip).limit(limit).all()
     return categories
@@ -42,7 +43,7 @@ def get_categories(
 @router.get("/{category_id}", response_model=schemas.Category)
 def get_category(category_id: int, db: Session = Depends(get_db)):
     """Получить категорию по ID"""
-    category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    category = db.query(Category).filter(Category.id == category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Категория не найдена")
     return category
@@ -55,14 +56,14 @@ def update_category(
     db: Session = Depends(get_db)
 ):
     """Обновить категорию"""
-    db_category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    db_category = db.query(Category).filter(Category.id == category_id).first()
     if not db_category:
         raise HTTPException(status_code=404, detail="Категория не найдена")
     
     # Проверка на уникальность имени, если оно обновляется
     if category.name and category.name != db_category.name:
-        existing_category = db.query(models.Category).filter(
-            models.Category.name == category.name
+        existing_category = db.query(Category).filter(
+            Category.name == category.name
         ).first()
         if existing_category:
             raise HTTPException(status_code=400, detail="Категория с таким именем уже существует")
@@ -79,12 +80,12 @@ def update_category(
 @router.delete("/{category_id}", status_code=204)
 def delete_category(category_id: int, db: Session = Depends(get_db)):
     """Удалить категорию"""
-    db_category = db.query(models.Category).filter(models.Category.id == category_id).first()
+    db_category = db.query(Category).filter(Category.id == category_id).first()
     if not db_category:
         raise HTTPException(status_code=404, detail="Категория не найдена")
     
     # Проверка на наличие книг в категории
-    books_count = db.query(models.Book).filter(models.Book.category_id == category_id).count()
+    books_count = db.query(Book).filter(Book.category_id == category_id).count()
     if books_count > 0:
         raise HTTPException(
             status_code=400,
@@ -94,4 +95,3 @@ def delete_category(category_id: int, db: Session = Depends(get_db)):
     db.delete(db_category)
     db.commit()
     return None
-

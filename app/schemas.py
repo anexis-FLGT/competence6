@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime
+from decimal import Decimal
 
 
 # Category Schemas
@@ -20,7 +20,6 @@ class CategoryUpdate(BaseModel):
 
 class Category(CategoryBase):
     id: int
-    created_at: datetime
 
     class Config:
         from_attributes = True
@@ -29,8 +28,9 @@ class Category(CategoryBase):
 # Book Schemas
 class BookBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
-    author: str = Field(..., min_length=1, max_length=100)
     description: Optional[str] = None
+    price: Optional[Decimal] = None
+    url: Optional[str] = Field(None, max_length=500)
     category_id: int
 
 
@@ -40,16 +40,15 @@ class BookCreate(BookBase):
 
 class BookUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
-    author: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = None
+    price: Optional[Decimal] = None
+    url: Optional[str] = Field(None, max_length=500)
     category_id: Optional[int] = None
 
 
 class Book(BookBase):
     id: int
-    created_at: datetime
     category: Optional[Category] = None
 
     class Config:
         from_attributes = True
-

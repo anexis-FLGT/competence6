@@ -51,7 +51,12 @@ CREATE DATABASE books_db;
 
 6. Запустите приложение:
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
+```
+
+Или используйте скрипт:
+```bash
+python run.py
 ```
 
 API будет доступно по адресу: http://localhost:8000
@@ -125,20 +130,63 @@ curl "http://localhost:8000/books?author=Толстой&category_id=1"
 competence6/
 ├── app/
 │   ├── __init__.py
-│   ├── database.py      # Настройка подключения к БД
-│   ├── models.py        # SQLAlchemy модели
-│   ├── schemas.py       # Pydantic схемы
-│   └── routers/
+│   ├── main.py          # Точка входа приложения FastAPI
+│   ├── schemas.py       # Pydantic схемы (Category, Book)
+│   ├── db/              # Работа с базой данных
+│   │   ├── __init__.py
+│   │   ├── db.py        # Настройка подключения к БД
+│   │   ├── models.py    # SQLAlchemy модели (Category, Book)
+│   │   └── crud.py      # CRUD операции
+│   └── api/             # API роутеры
 │       ├── __init__.py
-│       ├── categories.py  # Роутер для категорий
-│       └── books.py       # Роутер для книг
+│       ├── categories.py # Роутер для категорий
+│       └── books.py     # Роутер для книг
 ├── examples/            # Скриншоты работы API
-├── main.py             # Точка входа приложения
+├── run.py              # Скрипт для запуска приложения
+├── check_db.py         # Скрипт для проверки подключения к БД
+├── create_db.sh        # Скрипт для создания базы данных
+├── init_db.sql         # SQL скрипт для инициализации БД
+├── fix_tables.sql      # SQL скрипт для исправления таблиц
 ├── requirements.txt    # Зависимости проекта
 ├── .env.example        # Пример файла с переменными окружения
 ├── .gitignore
 └── README.md
 ```
+
+## Скриншоты и примеры
+
+В папке `examples/` должны быть размещены скриншоты работы API:
+
+1. **swagger_docs.png** - скриншот страницы `/docs` (Swagger UI)
+2. **health_check.png** - скриншот работы эндпоинта `/health`
+3. **categories_crud.png** - скриншоты CRUD операций с категориями
+4. **books_crud.png** - скриншоты CRUD операций с книгами
+5. **filtering.png** - скриншоты работы фильтрации
+6. **psql_select.png** - **ОБЯЗАТЕЛЬНО**: скриншот psql с SELECT запросами по таблицам categories и books
+
+### Инструкция по созданию скриншотов
+
+1. Запустите сервер: `uvicorn main:app --reload`
+2. Откройте браузер и перейдите на http://localhost:8000/docs
+3. Сделайте скриншоты:
+   - Главной страницы Swagger UI
+   - Тестирования каждого эндпоинта
+   - Результатов фильтрации
+4. **Создайте скриншот psql с SELECT запросами:**
+   - Подключитесь к базе данных: `psql -h localhost -U your_username -d books_db`
+   - Выполните запросы из файла `examples/psql_select_queries.sql`:
+     ```sql
+     SELECT * FROM categories;
+     SELECT * FROM books;
+     SELECT b.id, b.title, b.author, c.name AS category_name
+     FROM books b
+     JOIN categories c ON b.category_id = c.id;
+     ```
+   - Сделайте скриншот терминала с результатами запросов
+   - Сохраните как `psql_select.png`
+5. Сохраните все скриншоты в папку `examples/`
+
+**Примечание:** Если возникают проблемы с подключением к PostgreSQL через psql (ошибка "Peer authentication failed"), используйте подключение через TCP/IP: `psql -h localhost -U username -d books_db`. Подробные инструкции в файле `examples/PSQL_INSTRUCTIONS.md`.
 
 ## Чек-лист выполнения
 
@@ -154,5 +202,3 @@ competence6/
 ## Автор
 
 Проект выполнен в рамках задания по разработке REST API на FastAPI.
-
-# competence6

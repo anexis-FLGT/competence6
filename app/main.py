@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.database import engine, Base
-from app.routers import categories, books
+from app.db.db import engine, Base
+from app.api import categories, books
 
 # Создание таблиц в БД
 Base.metadata.create_all(bind=engine)
@@ -30,4 +30,3 @@ def root():
         "docs": "/docs",
         "health": "/health"
     }
-
